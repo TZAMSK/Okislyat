@@ -1,4 +1,5 @@
 mod binding_def;
+mod binding_usage;
 mod environment;
 mod expression;
 mod number;
@@ -9,8 +10,11 @@ mod value;
 #[cfg(test)]
 mod tests {
 
+    use crate::environment::Environment;
+
     use super::{
         binding_def::BindingDef,
+        binding_usage::BindingUsage,
         expression::Expression,
         number::Number,
         operations::Operation,
@@ -197,6 +201,46 @@ mod tests {
         assert_eq!(
             BindingDef::new("letaaa=1+2"),
             Err("expected a space".to_string())
+        );
+    }
+
+    #[test]
+    fn parse_binding_usage() {
+        assert_eq!(
+            BindingUsage::new("abc"),
+            Ok((
+                "",
+                BindingUsage {
+                    name: "abc".to_string(),
+                }
+            ))
+        );
+    }
+
+    #[test]
+    fn eval_existing_binding_usage() {
+        let mut env = Environment::default();
+        env.store_binding("foo".to_string(), Value::Number(10));
+
+        assert_eq!(
+            BindingUsage {
+                name: "foo".to_string(),
+            }
+            .evaluate(&env),
+            Ok(Value::Number(10)),
+        );
+    }
+
+    #[test]
+    fn eval_non_existent_binding_usage() {
+        let empty_env = Environment::default();
+
+        assert_eq!(
+            BindingUsage {
+                name: "i_dont_exist".to_string(),
+            }
+            .evaluate(&empty_env),
+            Err("binding with name ‘i_dont_exist’ does not exist".to_string()),
         );
     }
 }
