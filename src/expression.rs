@@ -1,4 +1,4 @@
-use crate::{number::Number, operations::Operation, utils};
+use crate::{number::Number, operations::Operation, utils, value::Value};
 
 #[derive(Debug, PartialEq)]
 pub struct Expression {
@@ -18,5 +18,19 @@ impl Expression {
         let (s, rhs) = Number::new(s);
 
         (s, Self { lhs, rhs, op })
+    }
+
+    pub(crate) fn evaluate(&self) -> Value {
+        let Number(lhs) = self.lhs;
+        let Number(rhs) = self.rhs;
+
+        let result = match self.op {
+            Operation::Add => lhs + rhs,
+            Operation::Sub => lhs - rhs,
+            Operation::Mul => lhs * rhs,
+            Operation::Div => lhs / rhs,
+        };
+
+        Value::Number(result)
     }
 }
