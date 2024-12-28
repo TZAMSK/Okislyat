@@ -9,17 +9,11 @@ pub enum Operation {
 }
 
 impl Operation {
-    pub fn new(s: &str) -> (&str, Self) {
-        let (s, op) = utils::extract_op(s);
-
-        let op = match op {
-            "+" => Self::Add,
-            "-" => Self::Sub,
-            "*" => Self::Mul,
-            "/" => Self::Div,
-            _ => panic!("bad operator"),
-        };
-
-        (s, op)
+    pub fn new(s: &str) -> Result<(&str, Self), String> {
+        utils::tag("+", s)
+            .map(|s| (s, Self::Add))
+            .or_else(|_| utils::tag("-", s).map(|s| (s, Self::Sub)))
+            .or_else(|_| utils::tag("*", s).map(|s| (s, Self::Mul)))
+            .or_else(|_| utils::tag("/", s).map(|s| (s, Self::Div)))
     }
 }
