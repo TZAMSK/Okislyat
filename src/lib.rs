@@ -10,7 +10,7 @@ mod tests {
         expression::Expression,
         number::Number,
         operations::Operation,
-        utils::{extract_digits, extract_op},
+        utils::{extract_digits, extract_op, extract_whitespace},
     };
 
     #[test]
@@ -41,7 +41,7 @@ mod tests {
     #[test]
     fn parse_one_plus_two() {
         assert_eq!(
-            Expression::new("1+2"),
+            Expression::new("1 + 2"),
             (
                 "",
                 Expression {
@@ -76,5 +76,10 @@ mod tests {
     #[test]
     fn extract_star() {
         assert_eq!(extract_op("*3"), ("3", "*"));
+    }
+
+    #[test]
+    fn extract_spaces() {
+        assert_eq!(extract_whitespace("   1"), ("1", "   "));
     }
 }
