@@ -4,8 +4,8 @@ use crate::utils;
 pub struct Number(pub i32);
 
 impl Number {
-    pub fn new(s: &str) -> (&str, Self) {
-        let (s, number) = utils::extract_digits(s);
-        (s, Self(number.parse().unwrap()))
+    pub fn new(s: &str) -> Result<(&str, Self), String> {
+        let (s, number) = utils::extract_digits(s)?;
+        Ok((s, Self(number.parse().unwrap())))
     }
 }

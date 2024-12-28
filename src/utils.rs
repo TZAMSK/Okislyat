@@ -1,18 +1,13 @@
-pub(crate) fn extract_digits(s: &str) -> (&str, &str) {
-    take_while(|c| c.is_ascii_digit(), s)
-}
-
-pub(crate) fn extract_op(s: &str) -> (&str, &str) {
-    match &s[0..1] {
-        "+" | "-" | "*" | "/" => {}
-        _ => panic!("bad operator"),
-    }
-
-    (&s[1..], &s[0..1])
+pub(crate) fn extract_digits(s: &str) -> Result<(&str, &str), String> {
+    take_while1(|c| c.is_ascii_digit(), s, "expected digits".to_string())
 }
 
 pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
     take_while(|c| c == ' ', s)
+}
+
+pub(crate) fn extract_whitespace1(s: &str) -> Result<(&str, &str), String> {
+    take_while1(|c| c == ' ', s, "expected a space".to_string())
 }
 
 pub(crate) fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str) {
@@ -27,7 +22,21 @@ pub(crate) fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str)
     (remainder, extracted)
 }
 
-pub(crate) fn extract_ident(s: &str) -> (&str, &str) {
+pub(crate) fn take_while1(
+    accept: impl Fn(char) -> bool,
+    s: &str,
+    error_msg: String,
+) -> Result<(&str, &str), String> {
+    let (remainder, extracted) = take_while(accept, s);
+
+    if extracted.is_empty() {
+        Err(error_msg)
+    } else {
+        Ok((remainder, extracted))
+    }
+}
+
+pub(crate) fn extract_ident(s: &str) -> Result<(&str, &str), String> {
     let input_starts_with_alphabetic = s
         .chars()
         .next()
@@ -35,16 +44,16 @@ pub(crate) fn extract_ident(s: &str) -> (&str, &str) {
         .unwrap_or(false);
 
     if input_starts_with_alphabetic {
-        take_while(|c| c.is_ascii_alphanumeric(), s)
+        Ok(take_while(|c| c.is_ascii_alphanumeric(), s))
     } else {
-        (s, "")
+        Err("expected identifier".to_string())
     }
 }
 
-pub(crate) fn tag<'a, 'b>(starting_text: &'a str, s: &'b str) -> &'b str {
+pub(crate) fn tag<'a, 'b>(starting_text: &'a str, s: &'b str) -> Result<&'b str, String> {
     if s.starts_with(starting_text) {
-        &s[starting_text.len()..]
+        Ok(&s[starting_text.len()..])
     } else {
-        panic!("expected {}", starting_text);
+        Err(format!("expected {}", starting_text))
     }
 }
